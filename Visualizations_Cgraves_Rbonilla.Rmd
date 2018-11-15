@@ -1,0 +1,102 @@
+---
+title: 'Wine: Final Project Visualizations'
+output:
+  html_document:
+    df_print: paged
+---
+#Connor Graves & Raquel Bonilla
+
+```{r, echo=F}
+library(dplyr)
+library(ggplot2)
+```
+
+Read in data
+```{r}
+wine <- read.csv("winemag-data-130k-v2.csv")
+```
+
+Display average wine score by US state
+```{r}
+USwine <- subset(wine, wine$country == "US")
+stateavg <- USwine %>%
+  group_by(province) %>%
+  summarize(avgPoints = mean(points))
+
+ggplot(stateavg, aes(x=province, y = avgPoints, fill = province)) + geom_bar(stat = "identity") + coord_cartesian(ylim = c(min(stateavg$avgPoints) - 2, max(stateavg$avgPoints) + 2)) + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0), legend.position="none") + labs(title = "Average Points of All Wines reviewed by US State", x = "State", y ="Average Points Earned")
+```
+
+Display average Merlot score by US state
+```{r}
+merlot <- subset(USwine, USwine$variety == "Merlot")
+
+merlotAvg <- merlot %>%
+  group_by(province) %>%
+  summarise(avgPoints = mean(points))
+
+ggplot(merlotAvg, aes(x=province, y = avgPoints, fill = province)) + geom_bar(stat = "identity") + coord_cartesian(ylim = c(min(merlotAvg$avgPoints) - 2, max(merlotAvg$avgPoints) + 2)) + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0), legend.position="none") + labs(title = "Average Points of Merlots reviewed by US State", x = "State", y ="Average Points Earned")
+```
+
+display average by Country
+```{r}
+countryAvg <- wine %>%
+  group_by(country) %>%
+  summarize(avgPoints = mean(points))
+
+ggplot(countryAvg, aes(x=country, y = avgPoints, fill = country)) + geom_bar(stat = "identity") + coord_cartesian(ylim = c(min(countryAvg$avgPoints) - 2, max(countryAvg$avgPoints) + 2)) + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0), legend.position="none") + labs(title = "Average Points of Wines reviewed by Country", x = "Country", y ="Average Points Earned")
+```
+
+Display reviews by reviewers
+```{r}
+select_name <- "Alexander Peartree"
+reviewer <- wine %>%
+              filter(taster_name == select_name)  %>%# the user can switch the name; maybe a toggle dropdown
+              arrange(desc(points)) %>%
+              select(taster_name, points, title, region_1)
+
+reviewer <- unique(reviewer) # get rid of duplicates
+
+num_to_display <- 5 # user can enter how many they want to see on the graph
+
+reviewer <- reviewer %>%
+              slice(1:num_to_display)
+#maybe have wine on the x axis, points on the y axis
+
+reviewer
+
+```
+
+Display graph of points given by reviewers
+```{r, fig.width=20, fig.height=8}
+lower <- reviewer[5,"points"]
+upper <- reviewer[1, "points"]
+
+ggplot(reviewer, aes(x=title, y=points, fill=region_1)) +
+    geom_bar(stat="identity") + ggtitle("Wine Points by Reviewer") + coord_cartesian(ylim = c(80, 100)) 
+# slider range maybe for ylim
+```
+
+```{r}
+ggplot(wine, aes(points,price)) + geom_point()
+```
+
+```{r}
+# display wine points by province
+# user can see what variety of wine is highest rated in a certain province
+# user can also see the title of the wine
+select_prov <- "Sicily & Sardinia"
+num_to_display <- 10
+provData <- wine %>%
+              filter(province == select_prov) %>%
+              arrange(desc(points))%>%
+              select(province, variety, points, variety, title)
+provData <- unique(provData)
+provData <- provData %>%
+              slice(1:num_to_display)
+              
+```
+
+```{r, fig.width=20, fig.height=12}
+ggplot(provData, aes(x=title, y=points, fill=variety)) + geom_bar(stat="identity") + ggtitle("Highest Points by Province") + coord_cartesian(ylim = c(80, 100)) + theme(axis.text.x = element_text(angle=90, hjust=1, vjust=0))
+```
+
