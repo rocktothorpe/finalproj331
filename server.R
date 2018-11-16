@@ -5,7 +5,7 @@ library(ggplot2)
 
 # Shiny App Draft: Wine Data
 # by Connor Graves and Raquel Bonilla
-setwd("../finalproj331/")
+# setwd("../finalproj331/")
 wine <- read.csv("winemag-data-130k-v2.csv")
 wine <- wine %>%
           slice(1:40000)
