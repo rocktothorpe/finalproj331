@@ -51,7 +51,7 @@ function(input, output, session) {
     ggplot(stateavg, aes(x=province, y = avgPoints, fill = province)) +
       geom_bar(stat = "identity") + coord_cartesian(ylim = c(min(stateavg$avgPoints) - 2, max(stateavg$avgPoints) + 2)) +
       theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0), legend.position="none") +
-      labs(title = paste("Average Points of", input$selectVariety, "Wines reviewed by Region of", input$selectCountry), x = "Region", y ="Average Points Earned")
+      labs(title = paste("Mean Points of", input$selectVariety, "Wines reviewed by Region of", input$selectCountry), x = "Region", y ="Mean Points Earned")
     
   })
   output$reviewPlot <- renderPlot({
