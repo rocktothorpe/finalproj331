@@ -4,7 +4,10 @@ pageWithSidebar(
     ## Input Widgets
     selectInput("selectCountry", label = h3("Country"), 
                 choices = as.list(countries), 
-                selected = "US"), hr(), fluidRow(column(3, verbatimTextOutput("value")))
+                selected = "US"), hr(), fluidRow(column(3, verbatimTextOutput("value"))),
+    selectInput("selectReviewer", label = h3("Reviewer"),
+                choices = as.list(reviewers),
+                selected = "Alexander Peartree"), hr(), fluidRow(column(3, verbatimTextOutput("value")))
   ),
   mainPanel(
     plotOutput('plot1'),
