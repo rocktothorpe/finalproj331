@@ -10,8 +10,7 @@ pageWithSidebar(
                 selected = "Alexander Peartree"), hr(), fluidRow(column(3, verbatimTextOutput("value")))
   ),
   mainPanel(
-    plotOutput('plot1'),
-    
-    plotOutput('plot2')
-      )
+      plotOutput('plot1'),
+      plotOutput('plot2')
+    )
 )
