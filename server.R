@@ -5,11 +5,8 @@ library(ggplot2)
 
 # Shiny App Draft: Wine Data
 # by Connor Graves and Raquel Bonilla
-# setwd("../finalproj331/")
-wine <- read.csv("winemag-data-130k-v2.csv")
-wine <- wine %>%
-  slice(1:40000)
 
+load("workspace.Rdata")
 # For wine points / country graph
 USwine <- subset(wine, wine$country == "US")
 stateavg <- USwine %>%
@@ -73,5 +70,11 @@ function(input, output, session) {
       labs(title = "Points by Reviewer", x = "Wine", y ="Points")
     
     
+  })
+  
+  output$quantilePlot <- renderPlot({
+    ggplot(wine, aes(x = eval(parse(text = input$`X Variable`)), y = eval(parse(text = input$`Y Variable`)),
+                     fill = eval(parse(text = input$`X Variable`)))) + geom_boxplot() + 
+      theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0), legend.position="none")
   })
 }

@@ -1,6 +1,6 @@
 library(tidyverse)
 
-wine <- read.csv("winemag-data-130k-v2.csv")
+load("workspace.Rdata")
 
 countries <- wine %>%
   select(country)
@@ -47,5 +47,28 @@ panel2 <- tabPanel("Reviewer Scores",
                      )
                    )
           )
+panel3 <- tabPanel("Quantile Analysis",
+                   sidebarLayout(
+                     sidebarPanel(
+                       selectInput("X Variable", label = h3("X Variable"),
+                                   choices = as.list(names(wine[c(-1,-3:-6, -12, -14)])),
+                                   selected = "taster_name"),
+                       selectInput("Y Variable", label = h3("Y Variable"),
+                                   choices = as.list(names(wine[c(-2:-4,-7:-14)])),
+                                   selected = "points"), hr()
+                     ),
+                     mainPanel(
+                       plotOutput('quantilePlot')
+                     )
+                   )
+)
+panel4 <- tabPanel("Regression Analysis",
+                   sidebarLayout(
+                     sidebarPanel(),
+                     mainPanel(
+                       plotOutput('regressionPlot')
+                     )
+                   )
+)
 
-navbarPage("Wine Stats!", panel1, panel2)
+navbarPage("Wine Stats!", panel1, panel2, panel3, panel4)
