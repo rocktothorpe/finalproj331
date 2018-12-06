@@ -59,7 +59,7 @@ panel3 <- tabPanel("Quantile Analysis",
                        selectInput("Y Variable", label = h3("Y Variable"),
                                    choices = as.list(names(wine[c(-2:-4,-7:-14)])),
                                    selected = "points"),
-                       sliderInput("Yrange", label = h3("Y Maximum"),
+                       sliderInput("Yrange", label = h3("Y Range"),
                                    min = 0, max = 3000, value = c(80,100)),
                        hr()
                      ),
