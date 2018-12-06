@@ -76,7 +76,8 @@ panel4 <- tabPanel("Regression Analysis",
                      ),
                      mainPanel(
                        plotOutput('strHistPlot'),
-                       plotOutput('fitStrPlot')
+                       plotOutput('fitStrPlot'),
+                       plotOutput('pricePointPlot')
                      )
                    )
 )

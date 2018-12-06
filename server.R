@@ -99,9 +99,6 @@ function(input, output, session) {
     
     ggplot(regTest, aes(x = fit, y = rst)) + geom_point() + coord_cartesian(ylim = c(0, input$Ymax)) + ylab("Standardized Residuals") + xlab("Fitted Values") + ggtitle("Standardized Residuals vs Fitted Value")
     
-    
-    
-    
   })
   output$fitStrPlot <- renderPlot({
     
@@ -110,11 +107,16 @@ function(input, output, session) {
     rst <- rstandard(mod)
     fit <- fitted(mod)
     
-    ggplot(regTest, aes(x = rst, y=..density..)) + geom_histogram(bins = 1000) + ggtitle("Distribution of Standardized residuals") + 
+    ggplot(regTest, aes(x = rst, y=..density..)) + geom_histogram(bins = 1000, fill="blue") + ggtitle("Distribution of Standardized residuals") + 
       ylab("Density") + xlab("Standardized Residuals") + coord_cartesian(xlim = c(-10, 10))
     
+  })
+  
+  output$pricePointPlot <- renderPlot({
+    # plot(rst~fit, main="Standardized Residuals vs Fitted Value", ylab ="Standardized Residuals", xlab="Fitted Value")
     
-    
+    ggplot(wine, aes(x = points, y = price)) + geom_point() + coord_cartesian(ylim = c(0, input$Ymax)) + 
+      ylab("Standardized Residuals") + xlab("Fitted Values") + ggtitle("Standardized Residuals vs Fitted Value")
     
   })
   
