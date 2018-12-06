@@ -64,7 +64,10 @@ panel3 <- tabPanel("Quantile Analysis",
 )
 panel4 <- tabPanel("Regression Analysis",
                    sidebarLayout(
-                     sidebarPanel(),
+                     sidebarPanel(
+                       sliderInput("Ymax", label = h3("Y Maximum"),
+                                   min = 0, max = 100, value = 100)
+                     ),
                      mainPanel(
                        plotOutput('regressionPlot')
                      )

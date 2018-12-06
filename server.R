@@ -1,12 +1,13 @@
 library(tidyverse)
 library(rlang)
 library(ggplot2)
+library(stringr)
 
 
 # Shiny App Draft: Wine Data
 # by Connor Graves and Raquel Bonilla
-
 load("workspace.Rdata")
+wine <- read.csv("../CourseDataSets/wine-reviews/winemag-data-130k-v2.csv", stringsAsFactors = F)
 # For wine points / country graph
 USwine <- subset(wine, wine$country == "US")
 stateavg <- USwine %>%
@@ -32,6 +33,13 @@ reviewers <- unique(reviewers)
 reviewers<- reviewers %>%
   arrange(taster_name)
 num_to_display <- 5
+
+# for regression modeling
+mod <- lm(wine$price ~ wine$points)
+rst <- rstandard(mod)
+fit <- fitted(mod)
+regTest <- as.data.frame(rst)
+regTest$fit <- fit
 
 function(input, output, session) {
   
@@ -67,7 +75,7 @@ function(input, output, session) {
     ggplot(reviewers, aes(x=title, y=points, fill=region_1)) +
       theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0), legend.position="none") +
       geom_bar(stat="identity") + coord_cartesian(ylim = c(80, 100)) +
-      labs(title = "Points by Reviewer", x = "Wine", y ="Points")
+      labs(title = "Points by Reviewer", x = "Wine", y ="Points") + scale_x_discrete(labels = function(title) str_wrap(title, width = 10))
     
     
   })
@@ -77,4 +85,29 @@ function(input, output, session) {
                      fill = eval(parse(text = input$`X Variable`)))) + geom_boxplot() + 
       theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0), legend.position="none")
   })
+  
+  output$regressionPlot <- renderPlot({
+    
+    # plot lmreg line for price vs points
+    ggplot(wine, aes(x=points, y=price)) + geom_point() + stat_smooth(method = "lm", col = "red") + 
+      coord_cartesian(ylim = c(0, 250))
+    # plot(wine$price ~ wine$points)
+    # abline(lm( wine$price ~ wine$points, data=wine))
+    mod <- lm(wine$price ~ wine$points)
+    rst <- rstandard(mod)
+    fit <- fitted(mod)
+    
+    # plot(rst~fit, main="Standardized Residuals vs Fitted Value", ylab ="Standardized Residuals", xlab="Fitted Value")
+    
+    ggplot(regTest, aes(x = fit, y = rst)) + geom_point(ylab = "Standardized Residuals", xlab ="Fitted Value") + coord_cartesian(ylim = c(0, input$Ymax)) +
+      geom_smooth()
+    
+    # ggplot(regTest, aes(x = rst)) + geom_histogram(stat="count")
+    
+    
+    
+  })
+  
+  
 }
+
