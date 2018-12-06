@@ -87,11 +87,8 @@ function(input, output, session) {
       coord_cartesian(ylim = c(input$Yrange[1], input$Yrange[2]))
   })
   
-  output$regressionPlot <- renderPlot({
+  output$strHistPlot <- renderPlot({
     
-    # plot lmreg line for price vs points
-    ggplot(wine, aes(x=points, y=price)) + geom_point() + stat_smooth(method = "lm", col = "red") + 
-      coord_cartesian(ylim = c(0, 250))
     # plot(wine$price ~ wine$points)
     # abline(lm( wine$price ~ wine$points, data=wine))
     mod <- lm(wine$price ~ wine$points)
@@ -100,10 +97,22 @@ function(input, output, session) {
     
     # plot(rst~fit, main="Standardized Residuals vs Fitted Value", ylab ="Standardized Residuals", xlab="Fitted Value")
     
-    ggplot(regTest, aes(x = fit, y = rst)) + geom_point(ylab = "Standardized Residuals", xlab ="Fitted Value") + coord_cartesian(ylim = c(0, input$Ymax)) +
-      geom_smooth()
+    ggplot(regTest, aes(x = fit, y = rst)) + geom_point() + coord_cartesian(ylim = c(0, input$Ymax)) + ylab("Standardized Residuals") + xlab("Fitted Values") + ggtitle("Standardized Residuals vs Fitted Value")
     
-    # ggplot(regTest, aes(x = rst)) + geom_histogram(stat="count")
+    
+    
+    
+  })
+  output$fitStrPlot <- renderPlot({
+    
+    # plot lmreg line for price vs points
+    mod <- lm(wine$price ~ wine$points)
+    rst <- rstandard(mod)
+    fit <- fitted(mod)
+    
+    ggplot(regTest, aes(x = rst, y=..density..)) + geom_histogram(bins = 1000) + ggtitle("Distribution of Standardized residuals") + 
+      ylab("Density") + xlab("Standardized Residuals") + coord_cartesian(xlim = c(-10, 10))
+    
     
     
     

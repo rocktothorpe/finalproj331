@@ -75,7 +75,8 @@ panel4 <- tabPanel("Regression Analysis",
                                    min = 0, max = 100, value = 100)
                      ),
                      mainPanel(
-                       plotOutput('regressionPlot')
+                       plotOutput('strHistPlot'),
+                       plotOutput('fitStrPlot')
                      )
                    )
 )
