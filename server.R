@@ -2,12 +2,12 @@ library(tidyverse)
 library(rlang)
 library(ggplot2)
 library(stringr)
+library(pastecs)
 
 
 # Shiny App Draft: Wine Data
 # by Connor Graves and Raquel Bonilla
 load("workspace.Rdata")
-wine <- read.csv("../CourseDataSets/wine-reviews/winemag-data-130k-v2.csv", stringsAsFactors = F)
 # For wine points / country graph
 USwine <- subset(wine, wine$country == "US")
 stateavg <- USwine %>%
@@ -67,10 +67,10 @@ function(input, output, session) {
       select(taster_name, points, title, region_1)
     #
     # # make this a widget as well
-    num_to_display <- 5
+    
     #
     reviewers <- reviewers %>%
-      slice(1:num_to_display)
+      slice(1:input$num_to_display)
     
     ggplot(reviewers, aes(x=title, y=points, fill=region_1)) +
       theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0), legend.position="none") +
@@ -83,7 +83,8 @@ function(input, output, session) {
   output$quantilePlot <- renderPlot({
     ggplot(wine, aes(x = eval(parse(text = input$`X Variable`)), y = eval(parse(text = input$`Y Variable`)),
                      fill = eval(parse(text = input$`X Variable`)))) + geom_boxplot() + 
-      theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0), legend.position="none")
+      theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0), legend.position="none") + labs(x = input$`X Variable`, y= input$`Y Variable`) +
+      coord_cartesian(ylim = c(input$Yrange[1], input$Yrange[2]))
   })
   
   output$regressionPlot <- renderPlot({
@@ -108,6 +109,16 @@ function(input, output, session) {
     
   })
   
+  output$subSummary <- renderTable({
+    if(input$selectVariety == "All")
+      USwine <- subset(wine, wine$country == input$selectCountry)
+    if(input$selectVariety != "All")
+      USwine <- subset(wine, wine$country == input$selectCountry & wine$variety == input$selectVariety)
+    table <- stat.desc(USwine[c("price", "points")])
+    table$Statistic = c("Number of Values", "Number of Nulls", "Number of NAs", "min", "max", "range", "sum", "median", "mean", "SE.mean", "CI.mean.0.95", "var", "std.dev", "coef.var")
+    table <- table[c(3,1,2)]
+    table
+  })
   
 }
 

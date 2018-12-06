@@ -27,6 +27,7 @@ panel1 <- tabPanel("Score by Country",
                        selectInput("selectVariety", label = h3("Variety"),
                                    choices = c("All", as.list(varieties)),
                                    selected = "All"),
+                       tableOutput("subSummary"),
                        hr()
                      ),
                      mainPanel(
@@ -40,7 +41,9 @@ panel2 <- tabPanel("Reviewer Scores",
                      sidebarPanel(
                        selectInput("selectReviewer", label = h3("Reviewer"),
                                    choices = as.list(reviewers),
-                                   selected = "Alexander Peartree"), hr()
+                                   selected = "Alexander Peartree"),
+                       sliderInput("num_to_display", label = h3("Number to display"),
+                                   min = 1, max = 100, value = 5), hr()
                      ),
                      mainPanel(
                        plotOutput('reviewPlot')
@@ -55,7 +58,10 @@ panel3 <- tabPanel("Quantile Analysis",
                                    selected = "taster_name"),
                        selectInput("Y Variable", label = h3("Y Variable"),
                                    choices = as.list(names(wine[c(-2:-4,-7:-14)])),
-                                   selected = "points"), hr()
+                                   selected = "points"),
+                       sliderInput("Yrange", label = h3("Y Maximum"),
+                                   min = 0, max = 3000, value = c(80,100)),
+                       hr()
                      ),
                      mainPanel(
                        plotOutput('quantilePlot')
