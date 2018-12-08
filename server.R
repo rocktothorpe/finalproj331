@@ -4,16 +4,23 @@ library(ggplot2)
 library(stringr)
 library(pastecs)
 library(networkD3)
+library(RColorBrewer)
 
 
 # Shiny App Draft: Wine Data
 # by Connor Graves and Raquel Bonilla
 load("workspace.Rdata")
+
 # For wine points / country graph
 USwine <- subset(wine, wine$country == "US")
 stateavg <- USwine %>%
   group_by(province) %>%
   summarize(avgPoints = mean(points))
+
+wineColors <- brewer.pal(9, "PuRd")
+wineColors <- wineColors[4:9]
+wineColors <- rep(wineColors, 10)
+
 
 countries <- wine %>%
   select(country)
@@ -55,7 +62,7 @@ function(input, output, session) {
       summarize(avgPoints = mean(points))
     
     ggplot(stateavg, aes(x=province, y = avgPoints, fill = province)) +
-      geom_bar(stat = "identity") + coord_cartesian(ylim = c(min(stateavg$avgPoints) - 2, max(stateavg$avgPoints) + 2)) +
+      geom_bar(stat = "identity", fill=wineColors[1:nrow(stateavg)]) + coord_cartesian(ylim = c(min(stateavg$avgPoints) - 2, max(stateavg$avgPoints) + 2)) +
       theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0), legend.position="none") +
       labs(title = paste("Mean Points of", input$selectVariety, "Wines reviewed by Region of", input$selectCountry), x = "Region", y ="Mean Points Earned")
     
@@ -66,12 +73,17 @@ function(input, output, session) {
       filter(taster_name == input$selectReviewer)  %>%# the user can switch the name; maybe a toggle dropdown
       arrange(desc(points)) %>%
       select(taster_name, points, title, region_1)
+    
+    reviewers <- reviewers %>% 
+                  distinct
+    
     reviewers <- reviewers %>%
       slice(1:input$num_to_display)
     
-    ggplot(reviewers, aes(x=title, y=points, fill=region_1)) +
+    
+    ggplot(reviewers, aes(x=title, y=points)) +
       theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0), legend.position="none") +
-      geom_bar(stat="identity") + coord_cartesian(ylim = c(80, 100)) +
+      geom_bar(stat="identity", fill=wineColors[1:input$num_to_display]) + coord_cartesian(ylim = c(80, 100)) +
       labs(title = "Points by Reviewer", x = "Wine", y ="Points") + scale_x_discrete(labels = function(title) str_wrap(title, width = 10))
     
   })
@@ -103,15 +115,22 @@ function(input, output, session) {
   
   output$d3Plot <- renderSimpleNetwork({
     
-    # d3 network of where the selected reviewer was reviewing the wines
-    target <- wine %>%
-                subset(taster_name==input$selectReviewer) %>%
-                select(region_1) %>%
-                slice(1:input$num_to_display)
+    target  <- wine %>%
+      filter(taster_name == input$selectReviewer)  %>%# the user can switch the name; maybe a toggle dropdown
+      arrange(desc(points)) 
+    target <- target %>%
+                distinct
+    
+      target <- target %>%
+                  select(region_1) %>%
+                  slice(1:input$num_to_display)
+    
+    
+    
     src <- rep(c(input$selectReviewer), input$num_to_display)
     target <- as.vector(target)
     networkData <- data.frame(src, target)
-    simpleNetwork(networkData, fontSize = 14, height = 10, width = 10, linkDistance = 80, opacity = 1.0)
+    simpleNetwork(networkData, fontSize = 14, height = 5, width = 10, linkDistance = 80, opacity = 1.0, nodeColour = wineColors)
     
   })
   

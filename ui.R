@@ -48,6 +48,7 @@ panel2 <- tabPanel("Reviewer Scores",
                      mainPanel(
                        plotOutput('reviewPlot'),
                        simpleNetworkOutput("d3Plot")
+                       
                      )
                    )
           )
