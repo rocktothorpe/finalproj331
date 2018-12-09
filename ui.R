@@ -31,7 +31,7 @@ panel1 <- tabPanel("Score by Country",
                        hr()
                      ),
                      mainPanel(
-                       plotOutput('countryPlot')
+                       plotOutput('countryPlot', height="700px")
                      )
                    )
           )
@@ -43,11 +43,11 @@ panel2 <- tabPanel("Reviewer Scores",
                                    choices = as.list(reviewers),
                                    selected = "Alexander Peartree"),
                        sliderInput("num_to_display", label = h3("Number to display"),
-                                   min = 1, max = 100, value = 5), hr()
+                                   min = 1, max = 10, value = 5), hr()
                      ),
                      mainPanel(
-                       plotOutput('reviewPlot'),
-                       simpleNetworkOutput("d3Plot")
+                       simpleNetworkOutput("d3Plot", height="200px"),
+                       plotOutput('reviewPlot', height = "600px")
                        
                      )
                    )
@@ -66,7 +66,7 @@ panel3 <- tabPanel("Quantile Analysis",
                        hr()
                      ),
                      mainPanel(
-                       plotOutput('quantilePlot')
+                       plotOutput('quantilePlot', height="700px"), br(), br()
                      )
                    )
 )
@@ -74,12 +74,12 @@ panel4 <- tabPanel("Regression Analysis",
                    sidebarLayout(
                      sidebarPanel(
                        sliderInput("Ymax", label = h3("Y Maximum"),
-                                   min = 0, max = 100, value = 100)
+                                   min = 0, max = 3000, value = 1500)
                      ),
                      mainPanel(
-                       plotOutput('strHistPlot'),
-                       plotOutput('fitStrPlot'),
-                       plotOutput('pricePointPlot')
+                       plotOutput('pricePointPlot'), br(), br(),
+                       plotOutput('strHistPlot'), br(), br(),
+                       plotOutput('fitStrPlot'), br(), br()
                      )
                    )
 )

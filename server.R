@@ -63,7 +63,7 @@ function(input, output, session) {
     
     ggplot(stateavg, aes(x=province, y = avgPoints, fill = province)) +
       geom_bar(stat = "identity", fill=wineColors[1:nrow(stateavg)]) + coord_cartesian(ylim = c(min(stateavg$avgPoints) - 2, max(stateavg$avgPoints) + 2)) +
-      theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0), legend.position="none") +
+      theme(text = element_text(size = 20), axis.text.x = element_text(angle = 90, size = 20, hjust = 1, vjust = 0), legend.position="none") +
       labs(title = paste("Mean Points of", input$selectVariety, "Wines reviewed by Region of", input$selectCountry), x = "Region", y ="Mean Points Earned")
     
   })
@@ -81,8 +81,8 @@ function(input, output, session) {
       slice(1:input$num_to_display)
     
     
-    ggplot(reviewers, aes(x=title, y=points)) +
-      theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0), legend.position="none") +
+    ggplot(reviewers, aes(x=title, y=points)) + 
+      theme(text = element_text(size = 20), axis.text.x = element_text(angle = 90, size = 14, hjust = 1, vjust = 0), legend.position="none") +
       geom_bar(stat="identity", fill=wineColors[1:input$num_to_display]) + coord_cartesian(ylim = c(80, 100)) +
       labs(title = "Points by Reviewer", x = "Wine", y ="Points") + scale_x_discrete(labels = function(title) str_wrap(title, width = 10))
     
@@ -91,25 +91,27 @@ function(input, output, session) {
   output$quantilePlot <- renderPlot({
     ggplot(wine, aes(x = eval(parse(text = input$`X Variable`)), y = eval(parse(text = input$`Y Variable`)),
                      fill = eval(parse(text = input$`X Variable`)))) + geom_boxplot() + 
-      theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0), legend.position="none") + labs(x = input$`X Variable`, y= input$`Y Variable`) +
+      theme(text = element_text(size = 20), axis.text.x = element_text(angle = 90, size = 20, hjust = 1, vjust = 0), legend.position="none") + labs(x = input$`X Variable`, y= input$`Y Variable`) +
       coord_cartesian(ylim = c(input$Yrange[1], input$Yrange[2]))
   })
   
   output$strHistPlot <- renderPlot({
     
-    ggplot(regTest, aes(x = fit, y = rst)) + geom_point() + coord_cartesian(ylim = c(0, input$Ymax)) + ylab("Standardized Residuals") + xlab("Fitted Values") + ggtitle("Standardized Residuals vs Fitted Value")
+    ggplot(regTest, aes(x = fit, y = rst)) + geom_point(colour=wineColors[6]) + coord_cartesian(ylim = c(0, 100)) + ylab("Standardized Residuals") + 
+      xlab("Fitted Values") + ggtitle("Standardized Residuals vs Fitted Value") + theme(text = element_text(size = 20), axis.text.x = element_text(angle = 90, size = 20, hjust = 1, vjust = 0))
     
   })
   output$fitStrPlot <- renderPlot({
     
-    ggplot(regTest, aes(x = rst, y=..density..)) + geom_histogram(bins = 1000, fill="blue") + ggtitle("Distribution of Standardized residuals") + 
-      ylab("Density") + xlab("Standardized Residuals") + coord_cartesian(xlim = c(-10, 10))
+    ggplot(regTest, aes(x = rst, y=..density..)) + geom_histogram(bins = 1000, fill=wineColors[5]) + ggtitle("Distribution of Standardized residuals") + 
+      ylab("Density") + xlab("Standardized Residuals") + coord_cartesian(xlim = c(-5, 5)) + theme(text = element_text(size = 20), axis.text.x = element_text(angle = 90, size = 20, hjust = 1, vjust = 0))
     
   })
   
   output$pricePointPlot <- renderPlot({
-    ggplot(wine, aes(x = points, y = price)) + geom_point() + coord_cartesian(ylim = c(0, 3000)) + 
-      ylab("Standardized Residuals") + xlab("Fitted Values") + ggtitle("Standardized Residuals vs Fitted Value")
+    ggplot(wine, aes(x = points, y = price)) + geom_point(colour=wineColors[6]) + coord_cartesian(ylim = c(0, input$Ymax)) + 
+      ylab("Price (in USD)") + xlab("Points") + ggtitle("Wine Price vs Point Value") + theme(text = element_text(size = 20), axis.text.x = element_text(angle = 90, size = 20, hjust = 1, vjust = 0)) + 
+      geom_smooth(method = "lm")
     
   })
   
