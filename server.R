@@ -1,3 +1,7 @@
+# Shiny App Draft: Wine Data
+# by Connor Graves and Raquel Bonilla
+
+# Dependencies
 library(tidyverse)
 library(rlang)
 library(ggplot2)
@@ -6,9 +10,6 @@ library(pastecs)
 library(networkD3)
 library(RColorBrewer)
 
-
-# Shiny App Draft: Wine Data
-# by Connor Graves and Raquel Bonilla
 load("workspace.RData")
 
 # For wine points / country graph
@@ -17,17 +18,22 @@ stateavg <- USwine %>%
   group_by(province) %>%
   summarize(avgPoints = mean(points))
 
+# generate Color Pallette that resembles wine colors
 wineColors <- brewer.pal(9, "PuRd")
 wineColors <- wineColors[4:9]
 wineColors <- rep(wineColors, 10)
 
-
+# subset countries from wine data
 countries <- wine %>%
   select(country)
+
+# get unique countries and sort them alphabetically
 countries <- unique(countries)
 countries <- sort(countries$country)
 
 # For review ratings on wine graph
+# get each unique reviewer to develop a list to display to 
+# the user 
 reviewerList <- wine %>%
   select(taster_name)
 reviewerList <- unique(reviewerList$taster_name)
@@ -35,7 +41,6 @@ reviewers  <- wine %>%
   filter(taster_name == "Alexander Peartree")  %>%# the user can switch the name; maybe a toggle dropdown
   arrange(desc(points)) %>%
   select(taster_name, points, title, region_1)
-
 
 reviewers <- unique(reviewers)
 reviewers<- reviewers %>%
@@ -51,12 +56,14 @@ regTest$fit <- fit
 
 function(input, output, session) {
   
+  # this plot will graph point value vs wine variety of a country 
   output$countryPlot <- renderPlot({
     if(input$selectVariety == "All")
       USwine <- subset(wine, wine$country == input$selectCountry)
     if(input$selectVariety != "All")
       USwine <- subset(wine, wine$country == input$selectCountry & wine$variety == input$selectVariety)
     
+    # subset region that the user selected
     stateavg <- USwine %>%
       group_by(province) %>%
       summarize(avgPoints = mean(points))
@@ -67,8 +74,11 @@ function(input, output, session) {
       labs(title = paste("Mean Points of", input$selectVariety, "Wines reviewed by Region of", input$selectCountry), x = "Region", y ="Mean Points Earned")
     
   })
+  
+  # this graph will plot points based on a selected reviewer
   output$reviewPlot <- renderPlot({
     
+    # subset reviewers based off of user selection
     reviewers  <- wine %>%
       filter(taster_name == input$selectReviewer)  %>%# the user can switch the name; maybe a toggle dropdown
       arrange(desc(points)) %>%
@@ -77,6 +87,7 @@ function(input, output, session) {
     reviewers <- reviewers %>% 
                   distinct
     
+    # get only the number of reviews the user wants to view
     reviewers <- reviewers %>%
       slice(1:input$num_to_display)
     
@@ -88,6 +99,8 @@ function(input, output, session) {
     
   })
   
+  # plots quantiles, the user has a lot of freedom to select which data to view
+  # on the graph
   output$quantilePlot <- renderPlot({
     ggplot(wine, aes(x = eval(parse(text = input$`X Variable`)), y = eval(parse(text = input$`Y Variable`)),
                      fill = eval(parse(text = input$`X Variable`)))) + geom_boxplot() + 
@@ -95,6 +108,7 @@ function(input, output, session) {
       coord_cartesian(ylim = c(input$Yrange[1], input$Yrange[2]))
   })
   
+  # Start of regression testing
   output$strHistPlot <- renderPlot({
     
     ggplot(regTest, aes(x = fit, y = rst)) + geom_point(colour=wineColors[6]) + coord_cartesian(ylim = c(0, 100)) + ylab("Standardized Residuals") + 
@@ -112,9 +126,16 @@ function(input, output, session) {
     ggplot(wine, aes(x = points, y = price)) + geom_point(colour=wineColors[6]) + coord_cartesian(ylim = c(0, input$Ymax)) + 
       ylab("Price (in USD)") + xlab("Points") + ggtitle("Wine Price vs Point Value") + theme(text = element_text(size = 20), axis.text.x = element_text(angle = 90, size = 20, hjust = 1, vjust = 0)) + 
       geom_smooth(method = "lm")
+  })
+  
+  # output p-value for 
+  output$tTestSummary <- renderText({
+    t <- t.test(wine$points, wine$price)
+    return('P-Value for Price vs Points Plot via T-Test is < 2.2e-16')
     
   })
   
+  # networkd3 plot so user can see where a reviewer is reviewing the wines
   output$d3Plot <- renderSimpleNetwork({
     
     target  <- wine %>%
@@ -127,8 +148,6 @@ function(input, output, session) {
                   select(region_1) %>%
                   slice(1:input$num_to_display)
     
-    
-    
     src <- rep(c(input$selectReviewer), input$num_to_display)
     target <- as.vector(target)
     networkData <- data.frame(src, target)
@@ -136,13 +155,14 @@ function(input, output, session) {
     
   })
   
+  # output summary statistics onto app
   output$subSummary <- renderTable({
     if(input$selectVariety == "All")
       USwine <- subset(wine, wine$country == input$selectCountry)
     if(input$selectVariety != "All")
       USwine <- subset(wine, wine$country == input$selectCountry & wine$variety == input$selectVariety)
     table <- stat.desc(USwine[c("price", "points")])
-    table$Statistic = c("Number of Values", "Number of Nulls", "Number of NAs", "min", "max", "range", "sum", "median", "mean", "SE.mean", "CI.mean.0.95", "var", "std.dev", "coef.var")
+    table$Statistic = c("Number of Values", "Number of Nulls", "Number of NAs", "Min", "Max", "Range", "Sum", "Median", "Mean", "SE.mean", "Conf. Interval (95%)", "Variane", "Std Deviation", "Coeff Variance")
     table <- table[c(3,1,2)]
     table
   })

@@ -75,12 +75,14 @@ panel4 <- tabPanel("Regression Analysis",
                    sidebarLayout(
                      sidebarPanel(
                        sliderInput("Ymax", label = h3("Y Maximum"),
-                                   min = 0, max = 3000, value = 1500)
+                                   min = 0, max = 3000, value = 1500),
+                       textOutput("tTestSummary")
                      ),
                      mainPanel(
                        plotOutput('pricePointPlot'), br(), br(),
                        plotOutput('strHistPlot'), br(), br(),
                        plotOutput('fitStrPlot'), br(), br()
+                       
                      )
                    )
 )
