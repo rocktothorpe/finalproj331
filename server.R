@@ -9,7 +9,7 @@ library(RColorBrewer)
 
 # Shiny App Draft: Wine Data
 # by Connor Graves and Raquel Bonilla
-load("workspace.Rdata")
+load("workspace.RData")
 
 # For wine points / country graph
 USwine <- subset(wine, wine$country == "US")

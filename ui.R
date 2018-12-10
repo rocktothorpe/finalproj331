@@ -1,6 +1,7 @@
 library(tidyverse)
+library(networkD3)
 
-load("workspace.Rdata")
+load("workspace.RData")
 
 countries <- wine %>%
   select(country)
