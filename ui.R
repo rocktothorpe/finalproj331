@@ -67,6 +67,7 @@ panel3 <- tabPanel("Quantile Analysis",
                        hr()
                      ),
                      mainPanel(
+                       "Compare the minimum, Q1, median, Q3, and maximums of any quantitative variable grouped by any qualitative variable.",
                        plotOutput('quantilePlot', height="700px"), br(), br()
                      )
                    )

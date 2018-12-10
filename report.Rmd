@@ -1,0 +1,92 @@
+---
+title: "Final Project Report"
+output:
+  html_document: default
+  html_notebook: default
+author: Raquel Bonilla and Connor Graves
+---
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+library(ggplot2)
+library(dplyr)
+library(stringr)
+load("workspace.RData")
+
+```
+
+## Introduction
+For our final project, we chose to explore a data set about [wine reviews](https://www.kaggle.com/zynicide/wine-reviews) that we found on Kaggle. We chose this topic because we were interested in whether or not wines that had higher point scores were more expensive than wines with lower point scores. We were also curious as to which regions had the most expensive wines, and whether or not those wines had higher point scores than wines from other regions Our data set explores 130k observations of wine data.
+<br />
+According to [Wine Spectator](https://www.winespectator.com/display/show/id/scoring-scale), wines are reviewed on the following 100-point scale: 
+
+* 95 - 100 Classic
+* 90 - 94 Outstanding
+* 85 - 89 Very Good
+* 80 - 84 Good
+* 75 - 79 Mediocre
+* 50 - 74 Not Recommended
+
+## Using Our App
+
+### Score by Country
+
+On this tab, the user can explore wine point scores throughout the different regions of different countries. On the side panel, the user can change the country as well as choose to look at specific varieties of wines in that country. 
+<br />
+Descriptive statistics are also available to the user in the side panel.
+
+For example, if the user chose to anayze all varities of wines in the US, the graph would look like this:
+```{r, height=15, width=15}
+ggplot(stateavg, aes(x=province, y = avgPoints, fill = province)) +
+      geom_bar(stat = "identity", fill=wineColors[1:nrow(stateavg)]) + coord_cartesian(ylim = c(min(stateavg$avgPoints)- 2,max(stateavg$avgPoints) + 2)) +theme(text = element_text(size = 12), axis.text.x = element_text(angle = 90, size = 10, hjust = 1, vjust = 0),legend.position="none") + labs(title = paste("Mean Points of All Wines reviewed by Region of US"), x = "Region", y ="Mean Points Earned")
+```
+
+<br />
+After viewing this graph, I would know that if I wanted to try good wines, I would look for wines from the regions of Rhode Island, Oregon, Washington, and California.
+<br />
+
+### Reviewer Scores
+
+Do you have a favorite wine reviewer? On this slide, the user can view up to 10 wines that scored highest by the selected reviewer. The simple network at the top of the bar chart shows the regions of the displayed wines, as well as the reviewer.
+
+For example, if your favorite wine reviewer happens to be Alexander Peartree, you can use our app to see his highest reviewed wines. If you were interested in the top 3 wines reviewed by him, your graph would look something like this:
+```{r, height = 15, width = 15}
+reviewers <- reviewers %>%
+      slice(1:3)
+    
+    ggplot(reviewers, aes(x=title, y=points)) + 
+      theme(text = element_text(size = 14), axis.text.x = element_text(angle = 90, size = 12, hjust = 1, vjust = 0), legend.position="none") + geom_bar(stat="identity", fill=wineColors[1:3]) + coord_cartesian(ylim = c(80, 100)) + labs(title = "Points by Reviewer", x = "Wine", y ="Points") + scale_x_discrete(labels = function(title) str_wrap(title, width = 10))
+```
+
+
+### Quantile Analysis
+
+Here, the user has the freedom to choose what to plot. The user can choose to plot, for example, points vs taster name. This will render a boxplot, and the user can then see how they comparatively score wines.
+
+
+### Regression Analysis
+
+One of the questions we had was whether or not expensive wines are actually better than cheaper wines. In order to do this, we made a regression model with points versus prices. We had to make sure that regression assumptions were met, so we plotted density versus standardized residuals. The resulting plot appeared to be normal (slightly skewed right), not violating our regression assumptions.
+
+```{r}
+ ggplot(regTest, aes(x = fit, y = rst)) + geom_point(colour=wineColors[6]) + coord_cartesian(ylim = c(0, 100)) + ylab("Standardized Residuals") + xlab("Fitted Values") + ggtitle("Standardized Residuals vs Fitted Value") + theme(text = element_text(size = 14), axis.text.x = element_text(angle = 90, size = 12, hjust = 1, vjust = 0))
+    
+```
+
+<br />
+We then plotted standardized residuals versus fitted value. The shape of the plot appears to be taking on a fan shape, so we knew our regression assumptions may be violated, even though the Wine Price vs Point Value seemed to have a positive slope. A T-Test between Price and Points yields a p-value of less than 2.2e-16. However, our regression testing reveals that we must be cautious when reading into the T-Test, since our regression assumptions may in fact be violated.
+```{r}
+t.test(wine$points, wine$price)
+```
+
+
+```{r}
+ ggplot(regTest, aes(x = fit, y = rst)) + geom_point(colour=wineColors[6]) + coord_cartesian(ylim = c(0, 100)) + ylab("Standardized Residuals") + xlab("Fitted Values") + ggtitle("Standardized Residuals vs Fitted Value") + theme(text = element_text(size = 14), axis.text.x = element_text(angle = 90, size = 12, hjust = 1, vjust = 0))
+    
+```
+
+
+## Conclusions
+
+From our exploration fo the data set, we found out which regions to look for the wines with higher scores. We also learned from looking at our statistics that good wines are not necessarily the most expensive. We learned a lot about wines, hopefully we can be more classy without seeming too pretentious...
+
+<br />
+<br />

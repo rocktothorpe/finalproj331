@@ -162,7 +162,7 @@ function(input, output, session) {
     if(input$selectVariety != "All")
       USwine <- subset(wine, wine$country == input$selectCountry & wine$variety == input$selectVariety)
     table <- stat.desc(USwine[c("price", "points")])
-    table$Statistic = c("Number of Values", "Number of Nulls", "Number of NAs", "Min", "Max", "Range", "Sum", "Median", "Mean", "SE.mean", "Conf. Interval (95%)", "Variane", "Std Deviation", "Coeff Variance")
+    table$Statistic = c("Number of Values", "Number of Nulls", "Number of NAs", "Min", "Max", "Range", "Sum", "Median", "Mean", "SE.mean", "Conf. Interval (95%)", "Variance", "Std Deviation", "Coeff Variance")
     table <- table[c(3,1,2)]
     table
   })
